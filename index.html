@@ -1,0 +1,195 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Disa - La Gatita Lectora de Cuentos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      min-height: 100vh;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-primary { background: #facc15; color: black; }
+    .btn-primary:hover { background: #eab308; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      resize: vertical;
+      color: black;
+      background-color: white;
+    }
+  </style>
+</head>
+<body class="flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-black/30 p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-yellow-400">🐾 Disa - La Gatita Lectora</h1>
+    <div>
+      <button id="btn-es" class="btn btn-primary">ES</button>
+      <button id="btn-en" class="btn btn-primary">EN</button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 flex flex-col items-center p-6">
+    <h2 class="text-3xl font-bold mb-4">Escribe o elige un cuento</h2>
+    <img src="https://sagasydisas.photonicnature.me/wp-content/uploads/2025/09/DISA.png" 
+         alt="Disa la gatita lectora" 
+         class="w-40 mb-6 rounded-full shadow-lg">
+
+    <!-- Campo de texto -->
+    <div class="w-full max-w-2xl bg-white p-6 rounded-xl mb-6">
+      <textarea id="textInput" placeholder="Escribe tu cuento aquí..."></textarea>
+      <div class="flex gap-4 justify-end mt-4">
+        <button id="clearBtn" class="btn btn-danger">Borrar</button>
+        <button id="stopBtn" class="btn btn-danger">Detener</button>
+        <button id="speakBtn" class="btn btn-primary">Leer en voz alta</button>
+      </div>
+    </div>
+
+    <!-- Historias -->
+    <div class="w-full max-w-3xl">
+      <h3 class="text-2xl font-bold text-yellow-400 mb-4">📖 Cuentos Nórdicos</h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-white/10 p-4 rounded-xl">
+          <h4 class="font-bold">Thor y el martillo mágico</h4>
+          <p class="text-sm mb-2">La aventura de Thor recuperando a Mjolnir.</p>
+          <button class="btn btn-primary storyBtn" data-text="Thor perdió su martillo Mjolnir, pero con ayuda de Loki logró recuperarlo disfrazándose en una boda mágica.">Leer este</button>
+        </div>
+        <div class="bg-white/10 p-4 rounded-xl">
+          <h4 class="font-bold">Freya y las lágrimas de oro</h4>
+          <p class="text-sm mb-2">La diosa del amor y su collar mágico Brísingamen.</p>
+          <button class="btn btn-primary storyBtn" data-text="Freya lloraba lágrimas de oro cuando extrañaba a su amado, y sus joyas brillaban tanto como las estrellas.">Leer este</button>
+        </div>
+        <div class="bg-white/10 p-4 rounded-xl">
+          <h4 class="font-bold">Yggdrasil</h4>
+          <p class="text-sm mb-2">El gran fresno que sostiene los nueve mundos.</p>
+          <button class="btn btn-primary storyBtn" data-text="En el centro del universo se alza Yggdrasil, el gran fresno que sostiene los nueve mundos de la mitología nórdica.">Leer este</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-black/30 text-center p-4">
+    <p class="text-sm">© 2025 Disas - Todos los derechos reservados</p>
+  </footer>
+
+  <!-- Script -->
+  <script>
+    const textInput = document.getElementById("textInput");
+    const speakBtn = document.getElementById("speakBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const storyBtns = document.querySelectorAll(".storyBtn");
+    const synth = window.speechSynthesis;
+
+    let lang = "es-AR";
+    let voiceEs = null;
+    let voiceEn = null;
+
+    function setVoices() {
+      const voices = synth.getVoices();
+
+      // 🔍 Buscar VOZ FEMENINA ARGENTINA AMABLE Y CALIDA (prioridad máxima)
+      // Priorizamos nombres comunes de voces femeninas en español de Argentina
+      voiceEs = voices.find(voice =>
+        voice.lang === "es-AR" &&
+        (voice.gender === "female" ||
+         voice.name.toLowerCase().includes("female") ||
+         voice.name.toLowerCase().includes("mujer") ||
+         voice.name.toLowerCase().includes("maría") ||
+         voice.name.toLowerCase().includes("sofía") ||
+         voice.name.toLowerCase().includes("lucía"))
+      ) ||
+      voices.find(voice =>
+        voice.lang === "es-AR" &&
+        (voice.name.toLowerCase().includes("female") ||
+         voice.name.toLowerCase().includes("mujer") ||
+         voice.name.toLowerCase().includes("maría") ||
+         voice.name.toLowerCase().includes("sofía") ||
+         voice.name.toLowerCase().includes("lucía"))
+      ) ||
+      voices.find(voice =>
+        voice.lang === "es-AR" && voice.rate <= 1.1 && voice.pitch >= 0.9
+      ) ||
+      voices.find(voice => voice.lang === "es-AR") ||
+      voices.find(voice =>
+        voice.lang.startsWith("es") &&
+        (voice.gender === "female" ||
+         voice.name.toLowerCase().includes("female") ||
+         voice.name.toLowerCase().includes("mujer"))
+      ) ||
+      voices.find(voice => voice.lang.startsWith("es"));
+
+      // Buscar voz masculina en inglés (como antes)
+      voiceEn = voices.find(voice =>
+        voice.lang.startsWith("en") &&
+        voice.name.toLowerCase().includes("male")
+      ) ||
+      voices.find(voice => voice.lang.startsWith("en"));
+
+      // Opcional: Ver qué voz se cargó (descomenta para depurar)
+      // console.log("Voz ES seleccionada:", voiceEs?.name || "No encontrada");
+    }
+
+    synth.onvoiceschanged = setVoices;
+
+    // Inicializar voces al cargar
+    if (synth.getVoices().length === 0) {
+      setTimeout(setVoices, 100); // Esperar un poco si aún no están cargadas
+    } else {
+      setVoices();
+    }
+
+    document.getElementById("btn-es").addEventListener("click", () => lang = "es-AR");
+    document.getElementById("btn-en").addEventListener("click", () => lang = "en-US");
+
+    speakBtn.addEventListener("click", () => {
+      if (synth.speaking) synth.cancel();
+      const texto = textInput.value.trim();
+      if (texto !== "") {
+        const utterance = new SpeechSynthesisUtterance(texto);
+        utterance.lang = lang;
+        if (lang.startsWith("es") && voiceEs) {
+          utterance.voice = voiceEs;
+          // Ajustes para hacer la voz más amable, cálida y adecuada para niños:
+          // Velocidad ligeramente más lenta, tono más alto y natural
+          utterance.rate = 0.85; // Más lento que 1.0 para sonar más calmado y comprensible
+          utterance.pitch = 1.15; // Un poco más agudo (tono más amable, típico de voces maternales)
+          utterance.volume = 0.9; // Volumen ligeramente reducido para sonar más suave
+        }
+        if (lang.startsWith("en") && voiceEn) utterance.voice = voiceEn;
+        synth.speak(utterance);
+      }
+    });
+
+    stopBtn.addEventListener("click", () => synth.cancel());
+    clearBtn.addEventListener("click", () => textInput.value = "");
+
+    storyBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        textInput.value = btn.getAttribute("data-text");
+      });
+    });
+  </script>
+</body>
+</html>
+```
